@@ -9,9 +9,7 @@ getDB().then((result) => {
 const getAll = () => {
     return new Promise((resolve, reject) => {
         db.collection(collectionName).find().toArray()
-        .then((result) => {
-            resolve(result);
-        })
+        .then(resolve)
         .catch((err) => {
             console.log(err);
             reject(err);
@@ -19,4 +17,12 @@ const getAll = () => {
     });
 }
 
-module.exports = { getAll }
+const userLogin = (username, password) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).findOne({Username: username, Password: password})
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+module.exports = { getAll, userLogin }
