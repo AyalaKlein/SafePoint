@@ -1,6 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://Assaf:assaf@mydb-hjrjz.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true });
+let db = null;
 
 const initDB = () => {
   return new Promise((resolve, reject) => {
@@ -15,4 +16,4 @@ const initDB = () => {
   });
 }
 
-export default {initDB, db}
+exports.default = {initDB, db}
