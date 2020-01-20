@@ -69,4 +69,42 @@ router.post('/register', (req, res, next) => {
     });
 });
 
+router.get('/getUserData', (req, res, next) => {
+  if (req.session.userData) {
+    userDal.getById(req.session.userData._id)
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(500).send("Failed while trying to retrieve the user by id: " + req.session.userData._id);
+      });
+  } else {
+    res.send(401).send("User must login");
+  }
+});
+
+router.post('/edit', (req, res, next) => {
+  if (req.session.userData) {
+    let userData = {
+      Username: req.body.username,
+      Password: req.body.password,
+      Age: req.body.age,
+      Fitness: req.body.fitness,
+      Cities: req.body.cities
+    };
+
+    userDal.updateUser(req.session.userData._id, userData)
+      .then(result => {
+        res.send(200).send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send("Failed while trying to update the user with the following data: " + req.body);
+      });
+  } else {
+    res.send(401).send("User must login");
+  }
+});
+
 module.exports = router;

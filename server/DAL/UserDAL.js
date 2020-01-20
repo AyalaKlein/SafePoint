@@ -17,9 +17,17 @@ const getAll = () => {
     });
 }
 
+const getById = (id) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).findOne({_id: id})
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
 const userLogin = (username, password) => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).findOne({Username: username, Password: password})
+        db.collection(collectionName).findOne({Username: username, Password: password}, {})
             .then(resolve)
             .catch(reject);
     });
@@ -41,4 +49,12 @@ const registerUser = (userData) => {
     });
 }
 
-module.exports = { getAll, userLogin, isUserExist, registerUser }
+const updateUser = (id, userData) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).updateOne({_id: id}, userData)
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+module.exports = { getAll, userLogin, isUserExist, registerUser, updateUser, getById }
