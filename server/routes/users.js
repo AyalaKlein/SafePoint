@@ -23,6 +23,7 @@ router.post('/login', (req, res, next) => {
     .then(result => {
       if (result) {
         req.session.userData = result;
+        req.session.save();
         res.status(200).json();
       } else {
         res.status(401).send("Username or password don't match");
@@ -31,6 +32,11 @@ router.post('/login', (req, res, next) => {
     .catch(err => {
       res.status(500).send(err);
     })
+});
+
+router.get('/logout', (req, res, next) => {
+  req.session.destroy();
+  res.status(200).send();
 });
 
 router.post('/register', (req, res, next) => {
