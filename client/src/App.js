@@ -1,5 +1,4 @@
 import React, { useState, Component } from 'react';
-import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import {
   Collapse,
   NavbarToggler,
@@ -14,38 +13,39 @@ import {
     Jumbotron, Button, Row, Container, Col, Card, CardImg, CardBody, CardTitle, CardSubtitle, CardText, Modal,
     ModalBody, ModalHeader, ModalFooter, Label, Input, InputGroup, Form, FormGroup, Navbar, NavbarBrand
 } from "reactstrap";
-import { render } from '@testing-library/react';
+import  LoginPage  from './login.js';
+import  AboutPage  from './about.js';
+import  ProfilePage  from './profile.js';
+import  UsersPage  from './users.js';
+import  SheltersPage  from './shelters.js';
+import  GoogleApiWrapper  from './sheltersMap.js';
 
-const mapStyles = {
-  width: '80%',
-  height: '80%'
-};
 
-
-class MapContainer extends Component 
+class App extends Component 
 {
   constructor(props) {
     super(props);
 
     this.state = {
-      stores: [{lat: 47.49855629475769, lng: -122.14184416996333},
-              {latitude: 47.359423, longitude: -122.021071},
-              {latitude: 47.2052192687988, longitude: -121.988426208496},
-              {latitude: 47.6307081, longitude: -122.1434325},
-              {latitude: 47.3084488, longitude: -122.2140121},
-              {latitude: 47.5524695, longitude: -122.0425407}]
+      render: ''
     }
+    
   }
 
-  displayMarkers = () => {
-    return this.state.stores.map((store, index) => {
-      return <Marker key={index} id={index} position={{
-       lat: store.latitude,
-       lng: store.longitude
-     }}
-     onClick={() => console.log("You clicked me!")} />
-    })
-  }
+  handleClick(compName, e){
+    console.log(compName);
+    this.setState({render:compName});        
+}
+_renderSubComp(){
+    switch(this.state.render){
+        case 'login': return <LoginPage/>
+        case 'about': return <AboutPage/>
+        case 'profile': return <ProfilePage/>
+        case 'users': return <UsersPage/>
+        case 'shelters': return <SheltersPage/>
+        default : return <GoogleApiWrapper/>
+    }
+}
 
   render() {
     return (
@@ -56,48 +56,35 @@ class MapContainer extends Component
       <Collapse navbar>
         <Nav className="mr-auto" navbar>
           <NavItem>
-            <NavLink path="/about">About</NavLink>
+            <NavLink onClick={this.handleClick.bind(this, 'about')}>About</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink onClick={this.handleClick.bind(this, 'users')}>Users</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink onClick={this.handleClick.bind(this, 'shelters')}>Shelters</NavLink>
           </NavItem>
           <NavItem>
             <NavLink href="https://github.com/AyalaKlein/SafePoint">GitHub</NavLink>
           </NavItem>
-          <UncontrolledDropdown nav inNavbar>
-            <DropdownToggle nav caret>
-              Options
-            </DropdownToggle>
-            <DropdownMenu right>
-              <DropdownItem>
-                Option 1
-              </DropdownItem>
-              <DropdownItem>
-                Option 2
-              </DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem>
-                Reset
-              </DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown>
         </Nav>
-        <NavbarText>Simple Text</NavbarText>
+        <Nav>
+        `<NavItem>
+            <NavLink onClick={this.handleClick.bind(this, 'profile')}>My Profile</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink onClick={this.handleClick.bind(this, 'login')}>Log In</NavLink>
+          </NavItem>
+        </Nav>
+        
       </Collapse>
     </Navbar>
-
-    <Map
-          google={this.props.google}
-          zoom={8}
-          style={mapStyles}
-          initialCenter={{ lat: 47.444, lng: -122.176}}
-        >
-          {this.displayMarkers()}
-        </Map>
+    {this._renderSubComp()}
     </div>
   
     )
   }
 }
 
-export default GoogleApiWrapper({
-  apiKey: 'AIzaSyA9JeZYGM9vsytm45dXISaRlRnW5HYSDic'
-})(MapContainer);
+export default App;
 
