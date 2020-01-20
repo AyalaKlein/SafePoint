@@ -40,7 +40,33 @@ router.get('/logout', (req, res, next) => {
 });
 
 router.post('/register', (req, res, next) => {
+  let userData = {
+    Username: req.body.username,
+    Password: req.body.password,
+    Age: req.body.age,
+    Fitness: req.body.fitness,
+    Cities: req.body.cities
+  };
 
+  userDal.isUserExist(userData.Username)
+    .then(user => {
+      if (user) {
+        res.status(403).send("Username is already taken");
+      }
+
+      userDal.registerUser(userData)
+        .then(result => {
+          res.status(200).send();
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).send("Failed while trying to register the user with the following data: " + req.body);
+        });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send("Failed while trying to register the user with the following data: " + req.body);
+    });
 });
 
 module.exports = router;

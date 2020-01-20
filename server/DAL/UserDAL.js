@@ -25,4 +25,20 @@ const userLogin = (username, password) => {
     });
 }
 
-module.exports = { getAll, userLogin }
+const isUserExist = (username) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).find({Username: username})
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+const registerUser = (userData) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).insertOne(userData)
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+module.exports = { getAll, userLogin, isUserExist, registerUser }
