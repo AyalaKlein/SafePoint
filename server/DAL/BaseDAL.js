@@ -16,4 +16,4 @@ const initDB = () => {
   });
 }
 
-exports.default = {initDB, db}
+module.exports = {initDB, db}
