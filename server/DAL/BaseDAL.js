@@ -3,17 +3,21 @@ const uri = "mongodb+srv://Assaf:assaf@mydb-hjrjz.mongodb.net/test?retryWrites=t
 const client = new MongoClient(uri, { useNewUrlParser: true });
 let db = null;
 
-const initDB = () => {
+const getDB = () => {
   return new Promise((resolve, reject) => {
-    client.connect(err => {
-      if (err) {
-        reject();
-      } else {
-        db = client.db("ShelterCityDB");
-        resolve();
-      }
-    });
+    if (!db) {
+      client.connect(err => {
+        if (err) {
+          reject();
+        } else {
+          db = client.db("ShelterCityDB");
+          resolve(db);
+        }
+      });
+    } else {
+      resolve(db);
+    }
   });
 }
 
-module.exports = {initDB, db}
+module.exports = {getDB}
