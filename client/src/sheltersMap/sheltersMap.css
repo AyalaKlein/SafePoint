@@ -1,0 +1,15 @@
+.side-button{
+    position: absolute;
+    left: 100%;
+    background: white;
+    z-index: 1000;
+    width: 23px;
+    height: 48px;
+    top: 10px;
+    font-size: 10px;
+}
+
+.map-marker{
+    font-size: 20px;
+    color: tomato;
+}
