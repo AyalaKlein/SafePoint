@@ -12,3 +12,13 @@ const getAll = () => {
         });
     });
 }
+
+const createShelter = (shelterData) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).insertOne(shelterData)
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+module.exports = { getAll, createShelter } 
