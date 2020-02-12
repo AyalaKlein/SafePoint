@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const shelterDal = require('../DAL/ShelterDAL');
 
-router.get('/', (req, res, next) => {
+router.get('/getall', (req, res, next) => {
   //const {radius = 300, latitude, longitude, limit, } = req.query
   //if (req.session.userData) {
     shelterDal.getAll()

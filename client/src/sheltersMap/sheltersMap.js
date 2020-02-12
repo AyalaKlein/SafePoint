@@ -19,22 +19,25 @@ class MapContainer extends Component {
     super(props);
 
     this.state = {
-      //TODO: need shelters from db
-      stores: [{ latitude: 47.49855629475769, longitude: -122.14184416996333 },
-      { latitude: 47.359423, longitude: -122.021071 },
-      { latitude: 47.2052192687988, longitude: -121.988426208496 },
-      { latitude: 47.6307081, longitude: -122.1434325 },
-      { latitude: 47.3084488, longitude: -122.2140121 },
-      { latitude: 47.5524695, longitude: -122.0425407 }]
+      shelters: []
     }
+  }
 
+  componentDidMount() {
+    fetch("http://localhost:3000/shelters/getall")
+    .then(res => res.json())
+    .then(result => {
+      this.setState({
+        shelters: result
+      })
+    })
   }
 
   displayMarkers = () => {
-    return this.state.stores.map((store, index) => {
+    return this.state.shelters.map((shelter, index) => {
       return <Marker key={index}
-        lat={store.latitude}
-        lng={store.longitude}
+        lat={shelter.LocY}
+        lng={shelter.LocX}
         //TODO: show shelter details
         onClick={() => console.log("You clicked me!")} />
     })
