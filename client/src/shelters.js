@@ -18,11 +18,13 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
 const SheltersPage = () => {
+    let lookupOptions = {};
+    for (let i=0; i<100; i++) {lookupOptions[i]=i};
     const columns = [
-        { title: 'LocX', field: 'LocX', type: 'numeric' },
-        { title: 'LocY', field: 'LocY', type: 'numeric' },
+        { title: 'LocX', field: 'LocX', type: 'numeric', customFilterAndSearch: (term, rowData) => rowData.LocX.toString().indexOf(term) != -1 },
+        { title: 'LocY', field: 'LocY', type: 'numeric', customFilterAndSearch: (term, rowData) => rowData.LocY.toString().indexOf(term) != -1 },
         { title: 'Description', field: 'Description'},
-        { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric'}
+        { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric', lookup: lookupOptions}
     ];
     const [shelters, setShelters] = React.useState([]);
     const [shouldRefetch, setShouldRefetch] = React.useState(true);
@@ -128,6 +130,9 @@ const SheltersPage = () => {
                 ThirdStateCheck: () => <Remove/>,
                 ViewColumn: () => <ViewColumn/>,
               }}
+            options={{
+                filtering: true
+            }}
              />
         </div>
     );
