@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component, useEffect } from 'react';
 import MaterialTable from 'material-table';
 
 import AddBox from '@material-ui/icons/AddBox';
@@ -18,20 +18,17 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
 const SheltersPage = () => {
-    const [state, setState] = React.useState({
-        columns: [
-          { title: 'LocX', field: 'LocX', type: 'numeric' },
-          { title: 'LocY', field: 'LocY', type: 'numeric' },
-          { title: 'Description', field: 'Description'},
-          { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric'}
-        ],
-        data: [
-            
-        ]
-      });
+    const columns = [
+        { title: 'LocX', field: 'LocX', type: 'numeric' },
+        { title: 'LocY', field: 'LocY', type: 'numeric' },
+        { title: 'Description', field: 'Description'},
+        { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric'}
+    ];
+    const [shelters, setShelters] = React.useState([]);
+    const [shouldRefetch, setShouldRefetch] = React.useState(true);
 
-    const loadShelters = () => {
-        return new Promise((resolve, reject) => {
+    useEffect(() => {
+        if (shouldRefetch) {
             fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/getAll`)
             .then(response => {
                 if (response.ok) {
@@ -41,15 +38,12 @@ const SheltersPage = () => {
                 }
             })
             .then(data => {
-                state.data = data;
-                resolve();
-            })
-            .catch(reject);
-        });
-    }
+                setShelters(data);
+            });
+            setShouldRefetch(false);
+        }
+    }, [shouldRefetch]);
 
-    loadShelters();
-    
     const onRowAddCallback = (newData) => {
         return new Promise(resolve => {
             fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/create`, {
@@ -61,7 +55,8 @@ const SheltersPage = () => {
             })
             .then(response => {
                 if (response.ok) {
-                    loadShelters().then(resolve);
+                    setShouldRefetch(true);
+                    resolve();
                 } else {
                     throw new Error('Something went wrong ...');
                 }
@@ -80,7 +75,8 @@ const SheltersPage = () => {
             })
             .then(response => {
                 if (response.ok) {
-                    loadShelters().then(resolve);
+                    setShouldRefetch(true);
+                    resolve();
                 } else {
                     throw new Error('Something went wrong ...');
                 }
@@ -93,7 +89,8 @@ const SheltersPage = () => {
             fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/delete/${oldData._id}`)
                 .then(response => {
                     if (response.ok) {
-                        loadShelters().then(resolve);
+                        setShouldRefetch(true);
+                        resolve();
                     } else {
                         throw new Error('Something went wrong ...');
                     }
@@ -105,8 +102,8 @@ const SheltersPage = () => {
         <div>
             <MaterialTable
             title="Shelters"
-            columns={state.columns}
-            data={state.data}
+            columns={columns}
+            data={shelters}
             editable={{
                 onRowAdd: onRowAddCallback,
                 onRowUpdate: onRowUpdateCallback,
