@@ -28,6 +28,7 @@ const SheltersPage = () => {
     ];
     const [shelters, setShelters] = React.useState([]);
     const [shouldRefetch, setShouldRefetch] = React.useState(true);
+    const [countLastMonth, setCountLastMonth] = React.useState(0);
 
     useEffect(() => {
         if (shouldRefetch) {
@@ -41,7 +42,18 @@ const SheltersPage = () => {
             })
             .then(data => {
                 setShelters(data);
-            });
+                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/updatedLastMonth`);
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Something went wrong ...');
+                }
+            })
+            .then(data => {
+                setCountLastMonth(data.length);
+            })
             setShouldRefetch(false);
         }
     }, [shouldRefetch]);
@@ -134,6 +146,9 @@ const SheltersPage = () => {
                 filtering: true
             }}
              />
+             <h1>
+        Only {countLastMonth} shelters from {shelters.length} were updated in the last month
+             </h1>
         </div>
     );
 };

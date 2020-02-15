@@ -16,6 +16,7 @@ const getAll = () => {
 
 const createShelter = (shelterData) => {
     return new Promise((resolve, reject) => {
+        shelterData.lastUpdateDate = new Date();
         db.collection(collectionName).insertOne(shelterData)
             .then(resolve)
             .catch(reject);
@@ -24,6 +25,7 @@ const createShelter = (shelterData) => {
 
 const editShelter = (_id, shelterData) => {
     return new Promise((resolve, reject) => {
+        shelterData.lastUpdateDate = new Date();``
         db.collection(collectionName).updateOne({_id: ObjectId(_id)}, {$set: shelterData})
             .then(resolve)
             .catch(reject);
@@ -38,4 +40,14 @@ const deleteShelter = (_id) => {
     })
 }
 
-module.exports = { getAll, createShelter, editShelter, deleteShelter } 
+const sheltersLastMonth = () => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).find({
+            lastUpdateDate: { $gt: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) }
+        }).toArray()
+        .then(resolve)
+        .catch(reject);
+    })
+}
+
+module.exports = { getAll, createShelter, editShelter, deleteShelter, sheltersLastMonth } 
