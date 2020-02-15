@@ -27,7 +27,7 @@ class MapContainer extends Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:3000/shelters/getall")
+    fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/getall`)
     .then(res => res.json())
     .then(result => {
       this.setState({

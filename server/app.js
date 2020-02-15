@@ -8,6 +8,7 @@ var usersRouter = require('./routes/users');
 var sheltersRouter = require('./routes/shelters');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+require('dotenv').config({path: __dirname + '/.env'});
 
 var app = express();
 
@@ -15,7 +16,7 @@ var app = express();
 app.use(function (req, res, next) {
 
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -55,5 +56,5 @@ app.use('/users', usersRouter);
 app.use('/shelters', sheltersRouter);
 
 const server = http.createServer(app);
-server.listen(3000);
-console.log('listening on port 3000');
+server.listen(process.env.SERVER_PORT);
+console.log(`listening on port ${process.env.SERVER_PORT}`);

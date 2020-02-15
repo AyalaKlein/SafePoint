@@ -22,11 +22,10 @@ const UsersPage = () => {
         users: [],
       });
 
-
-      fetch('http://localhost:3000/users/getAll')
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getAll`)
       .then(response => {
         if (response.ok) {
-        return response.json();
+          return response.json();
         } else {
           throw new Error('Something went wrong ...');
         }
