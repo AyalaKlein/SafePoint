@@ -33,7 +33,6 @@ class App extends Component {
   }
 
   handleClick(compName, e) {
-    console.log(compName);
     this.setState({ render: compName });
   }
   _renderSubComp() {
