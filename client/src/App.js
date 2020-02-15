@@ -13,7 +13,6 @@ import {
   Jumbotron, Button, Row, Container, Col, Card, CardImg, CardBody, CardTitle, CardSubtitle, CardText, Modal,
   ModalBody, ModalHeader, ModalFooter, Label, Input, InputGroup, Form, FormGroup, Navbar, NavbarBrand
 } from "reactstrap";
-import LoginPage from './login.js';
 import AboutPage from './about.js';
 import ProfilePage from './profile.js';
 import UsersPage from './users.js';
@@ -39,7 +38,6 @@ class App extends Component {
   }
   _renderSubComp() {
     switch (this.state.render) {
-      case 'login': return <LoginPage />
       case 'about': return <AboutPage />
       case 'profile': return <ProfilePage />
       case 'users': return <UsersPage />
@@ -72,9 +70,6 @@ class App extends Component {
             <Nav>
               `<NavItem>
                 <NavLink onClick={this.handleClick.bind(this, 'profile')}>My Profile</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink onClick={this.handleClick.bind(this, 'login')}>Log In</NavLink>
               </NavItem>
             </Nav>
 

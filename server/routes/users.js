@@ -3,16 +3,16 @@ var router = express.Router();
 const userDal = require('../DAL/UserDAL');
 
 router.get('/getall', (req, res, next) => {
-  if (req.session.userData) {
+  // if (req.session.userData) {
     userDal.getAll()
       .then((result) => {
         res.send(result);
       }).catch((err) => {
         res.status(500).send(err);
     });
-  } else {
-    res.status(401).send();
-  }
+  // } else {
+    // res.status(401).send();
+  // }
 });
 
 router.post('/login', (req, res, next) => {
