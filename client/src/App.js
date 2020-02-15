@@ -68,7 +68,7 @@ class App extends Component {
               </NavItem>
             </Nav>
             <Nav>
-              `<NavItem>
+              <NavItem>
                 <NavLink onClick={this.handleClick.bind(this, 'profile')}>My Profile</NavLink>
               </NavItem>
             </Nav>
