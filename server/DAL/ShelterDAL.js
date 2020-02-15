@@ -22,4 +22,20 @@ const createShelter = (shelterData) => {
     });
 }
 
-module.exports = { getAll, createShelter } 
+const editShelter = (_id, shelterData) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).updateOne({_id}, shelterData)
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+const deleteShelter = (_id) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).deleteOne({_id})
+            .then(resolve)
+            .catch(reject);
+    })
+}
+
+module.exports = { getAll, createShelter, editShelter, deleteShelter } 

@@ -16,7 +16,7 @@ router.get('/getall', (req, res, next) => {
   // }
 });
 
-router.post('/', (req, res, next) => {
+router.post('/create', (req, res, next) => {
   //if (req.session.userData) {
     shelterDal.createShelter()
       .then((result) => {
@@ -30,26 +30,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.post('/edit', (req, res, next) => {
-  if (req.session.userData) {
-    let userData = {
-      Username: req.body.username,
-      Password: req.body.password,
-      Age: req.body.age,
-      Fitness: req.body.fitness,
-      Cities: req.body.cities
-    };
-
-    userDal.updateUser(req.session.userData._id, userData)
-      .then(result => {
-        res.send(200).send();
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).send("Failed while trying to update the user with the following data: " + req.body);
-      });
-  } else {
-    res.send(401).send("User must login");
-  }
+  
 });
 
 module.exports = router;
