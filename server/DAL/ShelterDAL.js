@@ -1,4 +1,4 @@
-const { getDB } = require('./BaseDAL');
+const { getDB, ObjectId } = require('./BaseDAL');
 const collectionName = 'Shelters';
 let db = null;
 
@@ -24,7 +24,7 @@ const createShelter = (shelterData) => {
 
 const editShelter = (_id, shelterData) => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).updateOne({_id}, shelterData)
+        db.collection(collectionName).updateOne({_id: ObjectId(_id)}, {$set: shelterData})
             .then(resolve)
             .catch(reject);
     });
@@ -32,7 +32,7 @@ const editShelter = (_id, shelterData) => {
 
 const deleteShelter = (_id) => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).deleteOne({_id})
+        db.collection(collectionName).deleteOne({_id: ObjectId(_id)})
             .then(resolve)
             .catch(reject);
     })

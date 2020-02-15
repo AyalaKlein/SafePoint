@@ -18,10 +18,11 @@ router.get('/getall', (req, res, next) => {
 
 router.post('/create', (req, res, next) => {
   //if (req.session.userData) {
-    shelterDal.createShelter()
+    shelterDal.createShelter(req.body)
       .then((result) => {
         res.status(200).send();
       }).catch((err) => {
+        console.log(err);
         res.status(500).send(err);
     });
   // } else {
@@ -30,7 +31,32 @@ router.post('/create', (req, res, next) => {
 });
 
 router.post('/edit', (req, res, next) => {
-  
+  let newData = {
+    LocX: req.body.LocX,
+    LocY: req.body.LocY,
+    Description: req.body.Description,
+    MaxPopulation: req.body.MaxPopulation
+  };
+
+  shelterDal.editShelter(req.body._id, newData)
+    .then(result => {
+      res.status(200).send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send();
+    });
+});
+
+router.get('/delete/:id', (req, res, next) => {
+  shelterDal.deleteShelter(req.params.id)
+    .then(result => {
+      res.status(200).send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(err);
+    })
 });
 
 module.exports = router;

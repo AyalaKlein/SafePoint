@@ -1,4 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
+const {ObjectId} = require('mongodb')
 const uri = "mongodb+srv://Assaf:assaf@mydb-hjrjz.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true });
 let db = null;
@@ -20,4 +21,4 @@ const getDB = () => {
   });
 }
 
-module.exports = {getDB}
+module.exports = {getDB, ObjectId}
