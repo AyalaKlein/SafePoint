@@ -3,6 +3,7 @@ import React, { useState, Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { InfoWindow } from 'google-map-react';
 
 const mapStyles = {
   width: '100%',
@@ -17,9 +18,11 @@ const Marker = () => <Icon iconName="HomeSolid" className="map-marker"></Icon>
 class MapContainer extends Component {
   constructor(props) {
     super(props);
-
+    this.shelterClicked = this.shelterClicked.bind(this);
+    this.mapClicked = this.mapClicked.bind(this);
     this.state = {
-      shelters: []
+      shelters: [],
+      clickedShelter: null
     }
   }
 
@@ -33,13 +36,27 @@ class MapContainer extends Component {
     })
   }
 
+  shelterClicked(index, elem) {
+    this.setState({
+      clickedShelter: elem
+    });
+  }
+
+  mapClicked(a,b) {
+    this.setState({
+      clickedShelter: null
+    })
+  }
+
   displayMarkers = () => {
     return this.state.shelters.map((shelter, index) => {
-      return <Marker key={index}
-        lat={shelter.LocY}
-        lng={shelter.LocX}
-        //TODO: show shelter details
-        onClick={() => console.log("You clicked me!")} />
+      return (
+          <Marker key={shelter._id}
+                lat={shelter.LocY}
+                lng={shelter.LocX}
+                onClick={this.shelterClicked}>
+          </Marker>
+      )
     })
   }
 
@@ -60,8 +77,15 @@ class MapContainer extends Component {
           <GoogleMapReact
             bootstrapURLKeys={{ key: 'AIzaSyA9JeZYGM9vsytm45dXISaRlRnW5HYSDic' }}
             defaultZoom={defaultProps.zoom}
-            defaultCenter={defaultProps.center}>
+            defaultCenter={defaultProps.center}
+            onChildClick={this.shelterClicked}
+            onClick={this.mapClicked}>
             {this.displayMarkers()}
+            {/* {this.state.clickedShelter && 
+					 <InfoWindow position={{lat: this.state.clickedShelter.lat, lng: this.state.clickedShelter.lng}}>
+					     <h1>{this.state.clickedShelter.description}</h1>
+					 </InfoWindow>
+				 } */}
           </GoogleMapReact>
         </div>
       </div>
