@@ -29,6 +29,7 @@ const SheltersPage = () => {
     const [shelters, setShelters] = React.useState([]);
     const [shouldRefetch, setShouldRefetch] = React.useState(true);
     const [countLastMonth, setCountLastMonth] = React.useState(0);
+    const [sheltersCountByPopulation, setSheltersCountByPopulation] = React.useState([]);
 
     useEffect(() => {
         if (shouldRefetch) {
@@ -53,6 +54,17 @@ const SheltersPage = () => {
             })
             .then(data => {
                 setCountLastMonth(data.length);
+                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersCountByPopulation`);
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Something went wrong ...');
+                }
+            })
+            .then(data => {
+                setSheltersCountByPopulation(data);
             })
             setShouldRefetch(false);
         }
@@ -112,6 +124,28 @@ const SheltersPage = () => {
           });
     };
 
+    const getSheltersCountPopulation = () => {
+        return (
+            <table className={"shelter-table"}>
+                <tr>
+                    <th>Max Population</th>
+                    <th>Shelter Count</th>
+                </tr>
+                {sheltersCountByPopulation.map(currPop => {
+                    return <tr>
+                        <td>
+                            {currPop._id}
+                        </td>
+                        <td>
+                            {currPop.count}
+                        </td>
+                    </tr>
+                    })
+                }
+            </table>
+        );
+    }
+
     return (
         <div>
             <MaterialTable
@@ -146,9 +180,14 @@ const SheltersPage = () => {
                 filtering: true
             }}
              />
-             <h1>
-        Only {countLastMonth} shelters from {shelters.length} were created in the last month
-             </h1>
+             <div>
+                <h4>
+            Only {countLastMonth} shelters from {shelters.length} were created in the last month
+                </h4>
+             </div>
+             <div>
+                {getSheltersCountPopulation()}
+             </div>
         </div>
     );
 };

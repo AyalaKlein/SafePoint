@@ -70,4 +70,15 @@ router.get('/updatedLastMonth', (req, res, next) => {
     })
 });
 
+router.get('/sheltersCountByPopulation', (req, res, next) => {
+  shelterDal.sheltersCountByPopulation()
+    .then(result => {
+      res.status(200).send(result);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(err);
+    })
+});
+
 module.exports = router;
