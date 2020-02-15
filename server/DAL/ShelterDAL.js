@@ -25,7 +25,6 @@ const createShelter = (shelterData) => {
 
 const editShelter = (_id, shelterData) => {
     return new Promise((resolve, reject) => {
-        shelterData.lastUpdateDate = new Date();``
         db.collection(collectionName).updateOne({_id: ObjectId(_id)}, {$set: shelterData})
             .then(resolve)
             .catch(reject);

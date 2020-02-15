@@ -147,7 +147,7 @@ const SheltersPage = () => {
             }}
              />
              <h1>
-        Only {countLastMonth} shelters from {shelters.length} were updated in the last month
+        Only {countLastMonth} shelters from {shelters.length} were created in the last month
              </h1>
         </div>
     );
