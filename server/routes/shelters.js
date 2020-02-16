@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const shelterDal = require('../DAL/ShelterDAL');
+const TwitterApi = require('../utils/TwitterApi');
+const FacebookApi = require('../utils/FacebookApi');
 
 router.get('/getall', (req, res, next) => {
   //const {radius = 300, latitude, longitude, limit, } = req.query
@@ -20,6 +22,8 @@ router.post('/create', (req, res, next) => {
   //if (req.session.userData) {
     shelterDal.createShelter(req.body)
       .then((result) => {
+        // TwitterApi.twitShelter(req.body);
+        FacebookApi.shareShelter(req.body);
         res.status(200).send();
       }).catch((err) => {
         console.log(err);
