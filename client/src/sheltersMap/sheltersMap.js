@@ -30,6 +30,7 @@ class MapContainer extends Component {
     fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/getall`)
     .then(res => res.json())
     .then(result => {
+      console.log(result)
       this.setState({
         shelters: result
       })
@@ -37,6 +38,7 @@ class MapContainer extends Component {
   }
 
   shelterClicked(index, elem) {
+    console.log(elem)
     this.setState({
       clickedShelter: elem
     });
