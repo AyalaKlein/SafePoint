@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const userDal = require('../DAL/UserDAL');
+const TwitterApi = require('../utils/TwitterApi');
+const FacebookApi = require('../utils/FacebookApi');
 
 router.get('/getall', (req, res, next) => {
   // if (req.session.userData) {
@@ -56,6 +58,8 @@ router.post('/register', (req, res, next) => {
 
       userDal.registerUser(userData)
         .then(result => {
+          // TwitterApi.twitUser(userData);
+          FacebookApi.shareUser(userData);
           res.status(200).send();
         })
         .catch(err => {

@@ -6,6 +6,7 @@ var logger = require('morgan');
 var http = require('http');
 var usersRouter = require('./routes/users');
 var sheltersRouter = require('./routes/shelters');
+var newsRouter = require('./routes/news');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 require('dotenv').config({path: __dirname + '/.env'});
@@ -54,6 +55,7 @@ app.use(sessionMiddleware);
 
 app.use('/users', usersRouter);
 app.use('/shelters', sheltersRouter);
+app.use('/news', newsRouter);
 
 const server = http.createServer(app);
 server.listen(process.env.SERVER_PORT);
