@@ -46,7 +46,7 @@ router.post('/register', (req, res, next) => {
     Username: req.body.Username,
     Age: req.body.Age,
     Fitness: req.body.Fitness,
-    // Cities: req.body.cities
+    Cities: req.body.Cities
   };
 
   userDal.registerUser(userData)
@@ -82,7 +82,7 @@ router.post('/edit', (req, res, next) => {
       Username: req.body.Username,
       Age: req.body.Age,
       Fitness: req.body.Fitness,
-      //Cities: req.body.cities
+      Cities: req.body.Cities
     };
 
     userDal.updateUser(req.body._id, userData)
@@ -107,6 +107,38 @@ router.get('/delete/:id', (req, res) => {
       console.log(err);
       res.status(500).send(err);
     })
+});
+
+router.get('/getTopSelectedCities', (req, res) => {
+  userDal.getAll()
+    .then((results) => {
+        let allCities = [];
+        results.map(result => {
+          allCities = allCities.concat(result.Cities);
+        });
+
+        let counts = {};
+
+        allCities.forEach(city => {
+          const cityName = city.name
+          if (!counts[cityName]) {
+            counts[cityName] = 1;
+          } else {
+            counts[cityName] = counts[cityName] + 1
+          }
+        });
+
+        const countsArray = []
+        for (let b in counts) {
+          countsArray.push([b, counts[b]])
+        }
+
+        const topCities = countsArray.sort((a, b) => b[1] - a[1]).slice(0, 3).map(count => count[0]);
+        
+        res.send(topCities);
+    }).catch((err) => {
+      res.status(500).send(err);
+  });
 });
 
 module.exports = router;

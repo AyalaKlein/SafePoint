@@ -7,6 +7,7 @@ var http = require('http');
 var usersRouter = require('./routes/users');
 var sheltersRouter = require('./routes/shelters');
 var newsRouter = require('./routes/news');
+var citiesRouter = require('./routes/cities');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 require('dotenv').config({path: __dirname + '/.env'});
@@ -60,5 +61,6 @@ server.listen(process.env.SERVER_PORT);
 app.use('/users', usersRouter);
 app.use('/shelters', sheltersRouter(io));
 app.use('/news', newsRouter);
+app.use('/cities', citiesRouter);
 
 console.log(`listening on port ${process.env.SERVER_PORT}`);

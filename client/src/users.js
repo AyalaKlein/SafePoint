@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import MaterialTable from 'material-table';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -23,44 +22,63 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 const UsersPage = () => {
     const columns = [
         { title: 'Username', field: 'Username' },
-        { title: 'Fitness', field: 'Fitness' },
-        { title: 'Age', field: 'Age'},
-    ];
-
-    /*
-    const columns = [
-        { title: 'Username', field: 'Username' },
         { title: 'Fitness', field: 'Fitness', type: 'numeric' },
         { title: 'Age', field: 'Age', type: 'numeric' },
-        { title: 'Cities', field: 'Cities', render: (rowData) => (
-            rowData.Cities.map((city) => (
-                `${city.name}, `
-            ))
-        )}
+        { 
+            title: 'Cities',
+            field: 'Cities',
+            render: (rowData) => (
+              rowData.Cities.map((city) => (
+                  `${city.name}, `
+              ))
+            ),
+            editComponent: props => (
+              <Autocomplete
+                multiple
+                options={cities}
+                getOptionLabel={option => option.name}
+                defaultValue={props.rowData.Cities ? props.rowData.Cities : []}
+                onChange={(e, v) => props.onChange(v)}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                  />
+                )}
+              />
+            )
+        }
     ];
-    
-
-    // <InputLabel id='demo-mutiple-name-label'>Name</InputLabel>
-    //         <Select
-    //           labelId='demo-mutiple-name-label'
-    //           multiple
-    //           value={['asd']}
-    //           // onChange={handleChange}
-    //           // input={<Input />}
-    //           // MenuProps={MenuProps}
-    //         >
-    //           {[{id: 1, name: 'asd'}, {id: 2, name: 'dsa'}].map(city => (
-    //             <MenuItem key={city.id} value={city.name}>
-    //               {city.name}
-    //             </MenuItem>
-    //           ))}
-    //         </Select>
-    */
 
     const [users, setUsers] = React.useState([]);
+    const [cities, setCities] = React.useState([]);
+    const [recommendedCities, setRecommendedCities] = React.useState([]);
 
     useEffect(() => {
       fetchAllUsers();
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/cities/getAll`)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Something went wrong ...');
+            }
+        })
+        .then(data => {
+            setCities(data);
+        });
+
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getTopSelectedCities`)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Something went wrong ...');
+            }
+        })
+        .then(data => {
+            setRecommendedCities(data);
+        });
     }, []);
 
     const fetchAllUsers = () => (
@@ -94,7 +112,7 @@ const UsersPage = () => {
                 }
             });
         })
-    );
+      );
 
     const onRowUpdateCallback = (newUserData) => (
         new Promise(resolve => {
@@ -131,8 +149,9 @@ const UsersPage = () => {
     
     return (
         <div>
+            Consider adding these cities to users: { recommendedCities.map(city => <b style={{padding: '0 1vw'}}>{city}</b>) }
             <MaterialTable
-                title='Editable Example'
+                title='Users Table'
                 columns={columns}
                 data={users}
                 editable={{
