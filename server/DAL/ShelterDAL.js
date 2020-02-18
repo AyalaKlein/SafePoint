@@ -1,4 +1,5 @@
 const { getDB, ObjectId } = require('./BaseDAL');
+const moment = require('moment')
 const collectionName = 'Shelters';
 let db = null;
 
@@ -27,7 +28,7 @@ const createShelter = (shelterData) => {
 const editShelter = (_id, shelterData) => {
     return new Promise((resolve, reject) => {
         shelterData.MaxPopulation = parseInt(shelterData.MaxPopulation);
-        db.collection(collectionName).updateOne({_id: ObjectId(_id)}, {$set: shelterData})
+        db.collection(collectionName).updateOne({ _id: ObjectId(_id) }, { $set: shelterData })
             .then(resolve)
             .catch(reject);
     });
@@ -35,28 +36,37 @@ const editShelter = (_id, shelterData) => {
 
 const deleteShelter = (_id) => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).deleteOne({_id: ObjectId(_id)})
+        db.collection(collectionName).deleteOne({ _id: ObjectId(_id) })
             .then(resolve)
             .catch(reject);
     })
 }
 
-const sheltersLastMonth = () => {
+const sheltersByMonth = () => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).find({
-            lastUpdateDate: { $gt: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) }
-        }).toArray()
-        .then(resolve)
-        .catch(reject);
+        db.collection(collectionName).aggregate([
+            {
+                "$match": {
+                    "lastUpdateDate": { "$gte": moment().subtract(4, 'months').toDate() }
+                }
+            },
+            {
+                "$group": {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$lastUpdateDate" } },
+                    count: { $sum: 1 }
+                }
+            }]).toArray()
+            .then(resolve)
+            .catch(reject);
     })
 }
 
-const sheltersCountByPopulation = () => {
+const sheltersCountByMaxPopulation = () => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).aggregate([{"$group" : {_id:"$MaxPopulation", count:{$sum:1}}},{$sort:{"count":-1,"_id":-1}}]).toArray()
+        db.collection(collectionName).aggregate([{ "$group": { _id: "$MaxPopulation", count: { $sum: 1 } } }, { $sort: { "count": -1, "_id": -1 } }]).toArray()
             .then(resolve)
             .catch(reject);
     });
 }
 
-module.exports = { getAll, createShelter, editShelter, deleteShelter, sheltersLastMonth, sheltersCountByPopulation } 
+module.exports = { getAll, createShelter, editShelter, deleteShelter, sheltersByMonth, sheltersCountByMaxPopulation } 

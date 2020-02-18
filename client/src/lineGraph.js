@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import { scaleLinear, scaleTime } from 'd3-scale'
-import { max, extent } from 'd3-array'
+import { scaleLinear, scaleBand } from 'd3-scale'
+import { max } from 'd3-array'
 import { select } from 'd3-selection'
 import { line } from 'd3-shape'
 import { axisBottom, axisLeft, } from 'd3-axis'
@@ -18,15 +18,21 @@ export default class LineGraph extends Component {
     componentDidMount() {
         this.createLineGraph()
     }
+    
+    componentDidUpdate(){
+        console.log("update")
+        select(this.node).selectAll("svg").remove();
+        this.createLineGraph();
+    }
 
     createLineGraph() {
         const node = this.node
-        const { data, size, xName, yName, labels } = this.props
+        let { data, size, xName, yName, labels, scaleMonth } = this.props
         var margin = { top: 20, right: 30, bottom: 30, left: 60 }
         const width = size[0];
         const height = size[1];
 
-        const dataMax = max(data)
+        data = data.sort((a, b) => a[xName] - b[xName])
 
         var svg = select(node)
             .append("svg")
@@ -35,10 +41,10 @@ export default class LineGraph extends Component {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-        var x = scaleTime()
-            .domain(extent(data, d => d[xName]))
-            .range([0, width])
+        var x = scaleBand()
+            .rangeRound([0, width])
+            .paddingInner(0.05)
+            .domain(data.map(d => d[xName].toString()));
 
         svg.append("text")      // text label for the x axis
             .attr("x", (width + margin.left + margin.right) / 2)
@@ -48,7 +54,7 @@ export default class LineGraph extends Component {
 
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
-            .call(axisBottom(x).ticks(timeMonth).tickFormat(timeFormat('%y %b')));
+            .call(axisBottom(x));
 
         var y = scaleLinear()
             .domain([0, max(data, function (d) { return +d[yName]; })])
@@ -72,7 +78,7 @@ export default class LineGraph extends Component {
             .attr("stroke", "steelblue")
             .attr("stroke-width", 1.5)
             .attr("d", line()
-                .x((d) => x(d[xName]))
+                .x((d) => x(d[xName].toString()) + x.bandwidth()/2)
                 .y((d) => y(d[yName]))
             )
     }
@@ -84,10 +90,10 @@ export default class LineGraph extends Component {
 
 LineGraph.defaultProps = {
     data: [
-        { someName: new Date('2020-01-01'), otherName: 5 },
-        { someName: new Date('2020-02-01'), otherName: 10 },
-        { someName: new Date('2020-03-01'), otherName: 1 },
-        { someName: new Date('2020-04-01'), otherName: 3 }],
+        { someName: 1, otherName: 5 },
+        { someName: 30, otherName: 10 },
+        { someName: 20, otherName: 1 },
+        { someName: 5, otherName: 5 }],
     size: [500, 500],
     xName: 'someName',
     yName: 'otherName',

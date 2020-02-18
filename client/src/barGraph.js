@@ -7,6 +7,7 @@ import { line } from 'd3-shape'
 import { axisBottom, axisLeft, } from 'd3-axis'
 import { timeFormat } from 'd3-time-format'
 import { timeMonth } from 'd3-time'
+import * as moment from 'moment'
 
 export default class BarGraph extends Component {
     node = null
@@ -19,9 +20,15 @@ export default class BarGraph extends Component {
         this.createBarGraph()
     }
 
+    componentDidUpdate(){
+        console.log("update")
+        select(this.node).selectAll("svg").remove();
+        this.createBarGraph();
+    }
+
     createBarGraph() {
         const node = this.node
-        const { data, size, xName, yName } = this.props
+        const { data, size, xName, yName, labels } = this.props
         var margin = { top: 20, right: 30, bottom: 30, left: 60 }
         const width = size[0];
         const height = size[1];
@@ -35,18 +42,18 @@ export default class BarGraph extends Component {
 
         var xScale = scaleBand()
             .rangeRound([0, width])
-            .paddingInner(0.05)
-            .domain(data.map(d=> d[xName]));
-             
+            .paddingInner(0.1)
+            .domain([3,2,1,0].map(i=> moment().subtract(i, 'months').format('MMM YY') ));
+
         var yScale = scaleLinear()
             .rangeRound([height, 0])
-            .domain([0, max(data, d=> d[yName])]);
+            .domain([0, max(data, d => d[yName])]);
 
         svg.append("text")      // text label for the x axis
             .attr("x", (width + margin.left) / 2)
             .attr("y", height + margin.bottom)
             .style("text-anchor", "middle")
-            .text("Date");
+            .text(labels[xName]);
 
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
@@ -58,7 +65,7 @@ export default class BarGraph extends Component {
             .attr("x", 0 - (height / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
-            .text("Value");
+            .text(labels[yName]);
 
         svg.append("g")
             .call(axisLeft(yScale));
@@ -68,10 +75,10 @@ export default class BarGraph extends Component {
             .data(data)
             .enter()
             .append("rect")
-            .attr("x", d => xScale(d[xName]))
+            .attr("x", d => xScale(moment(d[xName]).format('MMM YY')))
             .attr("y", d => yScale(d[yName]))
-            .attr("height", d => height - yScale(d[yName])) 
-            .attr("width", xScale.bandwidth())
+            .attr("height", d => height - yScale(d[yName]))
+            .attr("width", d=> xScale.bandwidth())
     }
 
     render() {
@@ -81,10 +88,10 @@ export default class BarGraph extends Component {
 
 BarGraph.defaultProps = {
     data: [
-        { someName: 'hello', otherName: 5 },
-        { someName: 'good Bye', otherName: 10 },
-        { someName: 'wow', otherName: 1 },
-        { someName: 'no', otherName: 3 }],
+        { someName: new Date('2020-01-01'), otherName: 5 },
+        { someName: new Date('2020-02-01'), otherName: 10 },
+        { someName: new Date('2020-03-01'), otherName: 1 },
+        { someName: new Date('2020-04-01'), otherName: 3 }],
     size: [500, 500],
     xName: 'someName',
     yName: 'otherName',

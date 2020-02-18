@@ -21,53 +21,53 @@ import BarGraph from './barGraph';
 
 const SheltersPage = () => {
     let lookupOptions = {};
-    for (let i=0; i<100; i++) {lookupOptions[i]=i};
+    for (let i = 0; i < 100; i++) { lookupOptions[i] = i };
     const columns = [
         { title: 'LocX', field: 'LocX', type: 'numeric', customFilterAndSearch: (term, rowData) => rowData.LocX.toString().indexOf(term) != -1 },
         { title: 'LocY', field: 'LocY', type: 'numeric', customFilterAndSearch: (term, rowData) => rowData.LocY.toString().indexOf(term) != -1 },
-        { title: 'Description', field: 'Description'},
-        { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric', lookup: lookupOptions}
+        { title: 'Description', field: 'Description' },
+        { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric', lookup: lookupOptions }
     ];
     const [shelters, setShelters] = React.useState([]);
     const [shouldRefetch, setShouldRefetch] = React.useState(true);
-    const [countLastMonth, setCountLastMonth] = React.useState(0);
+    const [shelterChangesByMonth, setShelterChangesByMonth] = React.useState([]);
     const [sheltersCountByPopulation, setSheltersCountByPopulation] = React.useState([]);
 
     useEffect(() => {
         if (shouldRefetch) {
             fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/getAll`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
-            .then(data => {
-                setShelters(data);
-                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/updatedLastMonth`);
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
-            .then(data => {
-                setCountLastMonth(data.length);
-                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersCountByPopulation`);
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
-            .then(data => {
-                setSheltersCountByPopulation(data);
-            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
+                .then(data => {
+                    setShelters(data);
+                    return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersByMonth`);
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
+                .then(data => {
+                    setShelterChangesByMonth(data);
+                    return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersCountByPopulation`);
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
+                .then(data => {
+                    setSheltersCountByPopulation(data);
+                })
             setShouldRefetch(false);
         }
     }, [shouldRefetch]);
@@ -81,14 +81,14 @@ const SheltersPage = () => {
                 },
                 body: JSON.stringify(newData)
             })
-            .then(response => {
-                if (response.ok) {
-                    setShouldRefetch(true);
-                    resolve();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
+                .then(response => {
+                    if (response.ok) {
+                        setShouldRefetch(true);
+                        resolve();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
         });
     };
 
@@ -101,14 +101,14 @@ const SheltersPage = () => {
                 },
                 body: JSON.stringify(newData)
             })
-            .then(response => {
-                if (response.ok) {
-                    setShouldRefetch(true);
-                    resolve();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
+                .then(response => {
+                    if (response.ok) {
+                        setShouldRefetch(true);
+                        resolve();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
         });
     };
 
@@ -123,77 +123,55 @@ const SheltersPage = () => {
                         throw new Error('Something went wrong ...');
                     }
                 })
-          });
+        });
     };
-
-    const getSheltersCountPopulation = () => {
-        return (
-            <table className={"shelter-table"}>
-                <tr>
-                    <th>Max Population</th>
-                    <th>Shelter Count</th>
-                </tr>
-                {sheltersCountByPopulation.map(currPop => {
-                    return <tr>
-                        <td>
-                            {currPop._id}
-                        </td>
-                        <td>
-                            {currPop.count}
-                        </td>
-                    </tr>
-                    })
-                }
-            </table>
-        );
-    }
-
+    console.log(shelterChangesByMonth)
     return (
         <div>
             <MaterialTable
-            title="Shelters"
-            columns={columns}
-            data={shelters}
-            editable={{
-                onRowAdd: onRowAddCallback,
-                onRowUpdate: onRowUpdateCallback,
-                onRowDelete: onRowDeleteCallback
-              }}
-            icons= {{
-                Add: () => <AddBox/>,
-                Check: () => <Check/>,
-                Clear: () => <Clear/>,
-                Delete: () => <DeleteOutline/>,
-                DetailPanel: () => <ChevronRight/>,
-                Edit: () => <Edit/>,
-                Export: () => <SaveAlt/>,
-                Filter: () => <FilterList/>,
-                FirstPage: () => <FirstPage/>,
-                LastPage: () => <LastPage/>,
-                NextPage: () => <ChevronRight/>,
-                PreviousPage: () => <ChevronLeft/>,
-                ResetSearch: () => <Clear/>,
-                Search: () => <Search/>,
-                SortArrow: () => <ArrowDownward/>,
-                ThirdStateCheck: () => <Remove/>,
-                ViewColumn: () => <ViewColumn/>,
-              }}
-            options={{
-                filtering: true
-            }}
-             />
-             <div>
+                title="Shelters"
+                columns={columns}
+                data={shelters}
+                editable={{
+                    onRowAdd: onRowAddCallback,
+                    onRowUpdate: onRowUpdateCallback,
+                    onRowDelete: onRowDeleteCallback
+                }}
+                icons={{
+                    Add: () => <AddBox />,
+                    Check: () => <Check />,
+                    Clear: () => <Clear />,
+                    Delete: () => <DeleteOutline />,
+                    DetailPanel: () => <ChevronRight />,
+                    Edit: () => <Edit />,
+                    Export: () => <SaveAlt />,
+                    Filter: () => <FilterList />,
+                    FirstPage: () => <FirstPage />,
+                    LastPage: () => <LastPage />,
+                    NextPage: () => <ChevronRight />,
+                    PreviousPage: () => <ChevronLeft />,
+                    ResetSearch: () => <Clear />,
+                    Search: () => <Search />,
+                    SortArrow: () => <ArrowDownward />,
+                    ThirdStateCheck: () => <Remove />,
+                    ViewColumn: () => <ViewColumn />,
+                }}
+                options={{
+                    filtering: true
+                }}
+            />
+            <div>
                 <h4>
-            Only {countLastMonth} shelters from {shelters.length} were created in the last month
+                    Statistics
                 </h4>
-             </div>
-             <div>
-                {getSheltersCountPopulation()}
-             </div>
-             <LineGraph></LineGraph>
-             <BarGraph></BarGraph>
+            </div>
+            <div class="d-flex">
+
+                <LineGraph data={sheltersCountByPopulation} xName="_id" yName="count" labels={{_id: "תכולה מקסימלית", count:"כמות מקלטים"}}></LineGraph>
+                <BarGraph data={shelterChangesByMonth} xName="_id" yName="count" labels={{_id: "חודש", count:"כמות מקלטים"}}></BarGraph>
+            </div>
         </div>
     );
 };
- 
+
 export default SheltersPage;

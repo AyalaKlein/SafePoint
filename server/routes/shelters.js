@@ -59,8 +59,8 @@ router.get('/delete/:id', (req, res, next) => {
     })
 });
 
-router.get('/updatedLastMonth', (req, res, next) => {
-  shelterDal.sheltersLastMonth()
+router.get('/sheltersByMonth', (req, res, next) => {
+  shelterDal.sheltersByMonth()
     .then(result => {
       res.status(200).send(result);
     })
@@ -71,7 +71,7 @@ router.get('/updatedLastMonth', (req, res, next) => {
 });
 
 router.get('/sheltersCountByPopulation', (req, res, next) => {
-  shelterDal.sheltersCountByPopulation()
+  shelterDal.sheltersCountByMaxPopulation()
     .then(result => {
       res.status(200).send(result);
     })
