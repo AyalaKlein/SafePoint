@@ -18,7 +18,6 @@ export default class BarGraph extends Component {
     }
 
     componentDidUpdate(){
-        console.log("update")
         select(this.node).selectAll("svg").remove();
         this.createBarGraph();
     }

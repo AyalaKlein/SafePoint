@@ -18,7 +18,6 @@ export default class LineGraph extends Component {
     }
     
     componentDidUpdate(){
-        console.log("update")
         select(this.node).selectAll("svg").remove();
         this.createLineGraph();
     }
