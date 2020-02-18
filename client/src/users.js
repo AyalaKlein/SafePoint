@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import MaterialTable from 'material-table';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -24,52 +27,105 @@ const UsersPage = () => {
         { title: 'Age', field: 'Age'},
     ];
 
+    /*
+    const columns = [
+        { title: 'Username', field: 'Username' },
+        { title: 'Fitness', field: 'Fitness', type: 'numeric' },
+        { title: 'Age', field: 'Age', type: 'numeric' },
+        { title: 'Cities', field: 'Cities', render: (rowData) => (
+            rowData.Cities.map((city) => (
+                `${city.name}, `
+            ))
+        )}
+    ];
+    
+
+    // <InputLabel id='demo-mutiple-name-label'>Name</InputLabel>
+    //         <Select
+    //           labelId='demo-mutiple-name-label'
+    //           multiple
+    //           value={['asd']}
+    //           // onChange={handleChange}
+    //           // input={<Input />}
+    //           // MenuProps={MenuProps}
+    //         >
+    //           {[{id: 1, name: 'asd'}, {id: 2, name: 'dsa'}].map(city => (
+    //             <MenuItem key={city.id} value={city.name}>
+    //               {city.name}
+    //             </MenuItem>
+    //           ))}
+    //         </Select>
+    */
+
     const [users, setUsers] = React.useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getAll`)
-            .then(response => {
+      fetchAllUsers();
+    }, []);
+
+    const fetchAllUsers = () => (
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getAll`)
+      .then(response => {
+          if (response.ok) {
+              return response.json();
+          } else {
+              throw new Error('Something went wrong ...');
+          }
+      })
+      .then(data => {
+          setUsers(data);
+      })
+    );
+
+    const onRowAddCallback = (newUser) => (
+        new Promise(resolve => {
+            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            }).then(response => {
                 if (response.ok) {
-                    return response.json();
+                    fetchAllUsers();
+                    resolve();
+                } else {
+                    throw new Error('Something went wrong ...');
+                }
+            });
+        })
+    );
+
+    const onRowUpdateCallback = (newUserData) => (
+        new Promise(resolve => {
+            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUserData)
+            }).then(response => {
+                if (response.ok) {
+                    fetchAllUsers();
+                    resolve();
                 } else {
                     throw new Error('Something went wrong ...');
                 }
             })
-            .then(data => {
-                setUsers(data);
-            });
-    }, []);
-
-    const onRowAddCallback = (newUser) => (
-        new Promise(resolve => {
-            setTimeout(() => {
-                setUsers([...users, newUser]);
-                resolve();
-            }, 600);
-        })
-    );
-
-    const onRowUpdateCallback = (newUserData, oldUserData) => (
-        new Promise(resolve => {
-            setTimeout(() => {
-                if (oldUserData) {
-                  let data = [...users];
-                  data[data.indexOf(oldUserData)] = newUserData
-                  setUsers(data);
-                }
-                resolve();
-            }, 600);
         })
     );
 
     const onRowDeleteCallback = (userToDelete) => (
         new Promise(resolve => {
-            setTimeout(() => {
-                let data = [...users];
-                data.splice(data.indexOf(userToDelete), 1);
-                setUsers(data);
-                resolve();
-            }, 600);
+            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/delete/${userToDelete._id}`)
+              .then(response => {
+                  if (response.ok) {
+                      fetchAllUsers();
+                      resolve();
+                  } else {
+                      throw new Error('Something went wrong ...');
+                  }
+              })
         })
     );
     
