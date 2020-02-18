@@ -1,4 +1,4 @@
-const { getDB } = require('./BaseDAL');
+const { getDB, ObjectId } = require('./BaseDAL');
 const collectionName = 'Users';
 let db = null;
 
@@ -51,10 +51,27 @@ const registerUser = (userData) => {
 
 const updateUser = (id, userData) => {
     return new Promise((resolve, reject) => {
-        db.collection(collectionName).updateOne({_id: id}, userData)
+        db.collection(collectionName).updateOne({ _id: ObjectId(id) }, { $set: userData })
             .then(resolve)
             .catch(reject);
     });
 }
 
-module.exports = { getAll, userLogin, isUserExist, registerUser, updateUser, getById }
+const editShelter = (_id, shelterData) => {
+    return new Promise((resolve, reject) => {
+        shelterData.MaxPopulation = parseInt(shelterData.MaxPopulation);
+        db.collection(collectionName).updateOne({ _id: ObjectId(_id) }, { $set: shelterData })
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+const deleteUser = (id) => {
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName).deleteOne({ _id: ObjectId(id) })
+            .then(resolve)
+            .catch(reject);
+    });
+}
+
+module.exports = { getAll, userLogin, isUserExist, registerUser, updateUser, getById, deleteUser }

@@ -43,34 +43,22 @@ router.get('/logout', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
   let userData = {
-    Username: req.body.username,
-    Password: req.body.password,
-    Age: req.body.age,
-    Fitness: req.body.fitness,
-    Cities: req.body.cities
+    Username: req.body.Username,
+    Age: req.body.Age,
+    Fitness: req.body.Fitness,
+    // Cities: req.body.cities
   };
 
-  userDal.isUserExist(userData.Username)
-    .then(user => {
-      if (user) {
-        res.status(403).send("Username is already taken");
-      }
-
-      userDal.registerUser(userData)
-        .then(result => {
-          // TwitterApi.twitUser(userData);
-          FacebookApi.shareUser(userData);
-          res.status(200).send();
-        })
-        .catch(err => {
-          console.log(err);
-          res.status(500).send("Failed while trying to register the user with the following data: " + req.body);
-        });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).send("Failed while trying to register the user with the following data: " + req.body);
-    });
+  registerUser(userData)
+      .then(result => {
+        // TwitterApi.twitUser(userData);
+        FacebookApi.shareUser(userData);
+        res.status(200).send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send("Failed while trying to register the user with the following data: " + req.body);
+      });
 });
 
 router.get('/getUserData', (req, res, next) => {
@@ -89,16 +77,15 @@ router.get('/getUserData', (req, res, next) => {
 });
 
 router.post('/edit', (req, res, next) => {
-  if (req.session.userData) {
+  if (req.body) {
     let userData = {
-      Username: req.body.username,
-      Password: req.body.password,
-      Age: req.body.age,
-      Fitness: req.body.fitness,
-      Cities: req.body.cities
+      Username: req.body.Username,
+      Age: req.body.Age,
+      Fitness: req.body.Fitness,
+      //Cities: req.body.cities
     };
 
-    userDal.updateUser(req.session.userData._id, userData)
+    userDal.updateUser(req.body._id, userData)
       .then(result => {
         res.send(200).send();
       })
@@ -109,6 +96,17 @@ router.post('/edit', (req, res, next) => {
   } else {
     res.send(401).send("User must login");
   }
+});
+
+router.get('/delete/:id', (req, res) => {
+  userDal.deleteUser(req.params.id)
+    .then(result => {
+      res.status(200).send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(err);
+    })
 });
 
 module.exports = router;
