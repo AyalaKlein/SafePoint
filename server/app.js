@@ -13,6 +13,7 @@ require('dotenv').config({path: __dirname + '/.env'});
 
 var app = express();
 
+
 // Add headers
 app.use(function (req, res, next) {
 
@@ -52,11 +53,12 @@ var sessionMiddleware = session({
   secret: "blablba"
 });
 app.use(sessionMiddleware);
+const server = http.createServer(app);
+var io = require('socket.io')(server);
+server.listen(process.env.SERVER_PORT);
 
 app.use('/users', usersRouter);
-app.use('/shelters', sheltersRouter);
+app.use('/shelters', sheltersRouter(io));
 app.use('/news', newsRouter);
 
-const server = http.createServer(app);
-server.listen(process.env.SERVER_PORT);
 console.log(`listening on port ${process.env.SERVER_PORT}`);

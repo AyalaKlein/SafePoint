@@ -23,6 +23,8 @@
     "react-scripts": "^3.3.0",
     "react-signup-login-component": "^1.2.0",
     "reactstrap": "^8.2.0",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
     "styled-components": "^4.4.1",
     "video-react": "^0.14.1"
   },

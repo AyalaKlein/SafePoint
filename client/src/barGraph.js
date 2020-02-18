@@ -3,10 +3,7 @@ import React, { Component } from 'react';
 import { scaleLinear, scaleBand } from 'd3-scale'
 import { max, extent } from 'd3-array'
 import { select } from 'd3-selection'
-import { line } from 'd3-shape'
 import { axisBottom, axisLeft, } from 'd3-axis'
-import { timeFormat } from 'd3-time-format'
-import { timeMonth } from 'd3-time'
 import * as moment from 'moment'
 
 export default class BarGraph extends Component {

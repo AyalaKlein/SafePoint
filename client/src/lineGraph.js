@@ -5,8 +5,6 @@ import { max } from 'd3-array'
 import { select } from 'd3-selection'
 import { line } from 'd3-shape'
 import { axisBottom, axisLeft, } from 'd3-axis'
-import { timeFormat } from 'd3-time-format'
-import { timeMonth } from 'd3-time'
 
 export default class LineGraph extends Component {
     node = null
