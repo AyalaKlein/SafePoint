@@ -57,15 +57,6 @@ const updateUser = (id, userData) => {
     });
 }
 
-const editShelter = (_id, shelterData) => {
-    return new Promise((resolve, reject) => {
-        shelterData.MaxPopulation = parseInt(shelterData.MaxPopulation);
-        db.collection(collectionName).updateOne({ _id: ObjectId(_id) }, { $set: shelterData })
-            .then(resolve)
-            .catch(reject);
-    });
-}
-
 const deleteUser = (id) => {
     return new Promise((resolve, reject) => {
         db.collection(collectionName).deleteOne({ _id: ObjectId(id) })

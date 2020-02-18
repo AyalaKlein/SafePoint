@@ -49,7 +49,7 @@ router.post('/register', (req, res, next) => {
     // Cities: req.body.cities
   };
 
-  registerUser(userData)
+  userDal.registerUser(userData)
       .then(result => {
         // TwitterApi.twitUser(userData);
         FacebookApi.shareUser(userData);
