@@ -5,7 +5,7 @@ const cityDAL = require('../DAL/CityDAL');
 router.get('/getall', (req, res) => {
     cityDAL.getAll()
       .then((result) => {
-        res.send(result);
+        res.send(result.rows);
       }).catch((err) => {
         res.status(500).send(err);
     });

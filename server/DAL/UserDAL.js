@@ -1,68 +1,60 @@
-const { getDB, ObjectId } = require('./BaseDAL');
-const collectionName = 'Users';
-let db = null;
-
-getDB().then((result) => {
-    db = result;
-})
+const { pool } = require('./BaseDAL');
 
 const getAll = () => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).find().toArray()
-        .then(resolve)
-        .catch((err) => {
-            console.log(err);
-            reject(err);
-        });
-    });
+    return pool.query("SELECT * FROM \"Users\"")
 }
 
 const getById = (id) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).findOne({_id: id})
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "SELECT * FROM \"Users\" WHERE Id=$1",
+        values: [id]
+    }
+
+    return pool.query(query)
 }
 
 const userLogin = (username, password) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).findOne({Username: username, Password: password}, {})
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "SELECT * FROM \"Users\" WHERE Username=$1,Password=$2 limit 1",
+        values: [username, password]
+    }
+
+    return pool.query(query)
 }
 
 const isUserExist = (username) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).find({Username: username})
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "SELECT * FROM \"Users\" WHERE Username=$1 limit 1",
+        values: [username]
+    }
+
+    return pool.query(query)
 }
 
 const registerUser = (userData) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).insertOne(userData)
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "INSERT INTO \"Users\" (Id, Username, Password) VALUES (UsersSeq.nextval,$1,$2)",
+        values: [userData.username, userData.password]
+    }
+    
+    return pool.query(query)
 }
 
-const updateUser = (id, userData) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).updateOne({ _id: ObjectId(id) }, { $set: userData })
-            .then(resolve)
-            .catch(reject);
-    });
+const updateUser = (id, userData) => {  
+    let query = {
+        text: "UPDATE \"Users\" SET Username=$1, Password=$2 WHERE Id=$3",
+        values: [id, userData.username, userData.password]
+    }
+    
+    return pool.query(query)
 }
 
 const deleteUser = (id) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).deleteOne({ _id: ObjectId(id) })
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "DELETE FROM \"Users\" WHERE Id=$1",
+        values: [id]
+    }
+    return pool.query(query)
 }
 
 module.exports = { getAll, userLogin, isUserExist, registerUser, updateUser, getById, deleteUser }

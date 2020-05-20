@@ -17,8 +17,12 @@
     "moment": "^2.24.0",
     "mongodb": "^3.4.1",
     "morgan": "~1.9.1",
+    "pg": "^8.2.0",
     "request-promise": "^4.2.5",
     "socket.io": "^2.3.0",
     "twit": "^2.2.11"
+  },
+  "devDependencies": {
+    "install-peers": "^1.0.3"
   }
 }

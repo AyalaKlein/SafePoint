@@ -53,7 +53,7 @@ class MapContainer extends Component {
   displayMarkers = () => {
     return this.state.shelters.map((shelter, index) => {
       return (
-          <Marker key={shelter._id}
+          <Marker key={shelter.Id}
                 lat={parseFloat(shelter.LocY)}
                 lng={parseFloat(shelter.LocX)}
                 onClick={this.shelterClicked}>

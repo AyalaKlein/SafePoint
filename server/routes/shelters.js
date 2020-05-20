@@ -13,7 +13,7 @@ module.exports = function (io) {
     //if (req.session.userData) {
     shelterDal.getAll()
       .then((result) => {
-        res.send(result);
+        res.send(result.rows);
       }).catch((err) => {
         res.status(500).send(err);
       });
@@ -48,7 +48,7 @@ module.exports = function (io) {
       MaxPopulation: req.body.MaxPopulation
     };
 
-    shelterDal.editShelter(req.body._id, newData)
+    shelterDal.editShelter(req.body.Id, newData)
       .then(result => {
         res.status(200).send();
       })
@@ -72,7 +72,7 @@ module.exports = function (io) {
   router.get('/sheltersByMonth', (req, res, next) => {
     shelterDal.sheltersByMonth()
       .then(result => {
-        res.status(200).send(result);
+        res.status(200).send(result.rows);
       })
       .catch(err => {
         console.log(err);
@@ -83,7 +83,7 @@ module.exports = function (io) {
   router.get('/sheltersCountByPopulation', (req, res, next) => {
     shelterDal.sheltersCountByMaxPopulation()
       .then(result => {
-        res.status(200).send(result);
+        res.status(200).send(result.rows);
       })
       .catch(err => {
         console.log(err);

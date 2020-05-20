@@ -1,24 +1,12 @@
-const MongoClient = require('mongodb').MongoClient;
-const {ObjectId} = require('mongodb')
-const uri = "mongodb+srv://Assaf:assaf@mydb-hjrjz.mongodb.net/test?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-let db = null;
+const { Pool } = require('pg')
 
-const getDB = () => {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      client.connect(err => {
-        if (err) {
-          reject();
-        } else {
-          db = client.db("ShelterCityDB");
-          resolve(db);
-        }
-      });
-    } else {
-      resolve(db);
-    }
-  });
-}
+const pool = new Pool({
+  user: 'dgbvxovd',
+  host: 'kandula.db.elephantsql.com',
+  database: 'dgbvxovd',
+  password: 'RpPKxxeauYoEzrfZWZse47vF8nLuqA4y',
+  dbname: 'dgbvxovd',
+  port: 5432,
+})
 
-module.exports = {getDB, ObjectId}
+module.exports = { pool }

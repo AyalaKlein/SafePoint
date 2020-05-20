@@ -52,29 +52,29 @@ class SheltersPage extends Component {
             })
             .then(data => {
                 this.setState({ shelters: data });
-                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersByMonth`);
+                // return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersByMonth`);
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
-            .then(data => {
-                this.setState({ shelterChangesByMonth: data })
-                return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersCountByPopulation`);
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Something went wrong ...');
-                }
-            })
-            .then(data => {
-                this.setState({ sheltersCountByPopulation: data })
-            })
+            // .then(response => {
+            //     if (response.ok) {
+            //         return response.json();
+            //     } else {
+            //         throw new Error('Something went wrong ...');
+            //     }
+            // })
+            // .then(data => {
+            //     this.setState({ shelterChangesByMonth: data })
+            //     return fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/sheltersCountByPopulation`);
+            // })
+            // .then(response => {
+            //     if (response.ok) {
+            //         return response.json();
+            //     } else {
+            //         throw new Error('Something went wrong ...');
+            //     }
+            // })
+            // .then(data => {
+            //     this.setState({ sheltersCountByPopulation: data })
+            // })
     }
 
     onRowAddCallback = (newData) => {
@@ -118,7 +118,7 @@ class SheltersPage extends Component {
 
     onRowDeleteCallback = (oldData) => {
         return new Promise(resolve => {
-            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/delete/${oldData._id}`)
+            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/delete/${oldData.Id}`)
                 .then(response => {
                     if (response.ok) {
                         this.fetchData();
@@ -176,16 +176,16 @@ class SheltersPage extends Component {
                         filtering: true
                     }}
                 />
-                <div>
+                {/* <div>
                     <h4>
                         Statistics
                     </h4>
                 </div>
                 <div class="d-flex">
 
-                    <LineGraph data={sheltersCountByPopulation} xName="_id" yName="count" labels={{ _id: "תכולה מקסימלית", count: "כמות מקלטים" }}></LineGraph>
-                    <BarGraph data={shelterChangesByMonth} xName="_id" yName="count" labels={{ _id: "חודש", count: "כמות מקלטים" }}></BarGraph>
-                </div>
+                    <LineGraph data={sheltersCountByPopulation} xName="id" yName="count" labels={{ id: "תכולה מקסימלית", count: "כמות מקלטים" }}></LineGraph>
+                    <BarGraph data={shelterChangesByMonth} xName="id" yName="count" labels={{ id: "חודש", count: "כמות מקלטים" }}></BarGraph>
+                </div> */}
             </div>
         );
     }

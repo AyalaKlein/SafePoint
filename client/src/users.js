@@ -68,17 +68,17 @@ const UsersPage = () => {
             setCities(data);
         });
 
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getTopSelectedCities`)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Something went wrong ...');
-            }
-        })
-        .then(data => {
-            setRecommendedCities(data);
-        });
+    //   fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/getTopSelectedCities`)
+    //     .then(response => {
+    //         if (response.ok) {
+    //             return response.json();
+    //         } else {
+    //             throw new Error('Something went wrong ...');
+    //         }
+    //     })
+    //     .then(data => {
+    //         setRecommendedCities(data);
+    //     });
     }, []);
 
     const fetchAllUsers = () => (
@@ -135,7 +135,7 @@ const UsersPage = () => {
 
     const onRowDeleteCallback = (userToDelete) => (
         new Promise(resolve => {
-            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/delete/${userToDelete._id}`)
+            fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/users/delete/${userToDelete.Id}`)
               .then(response => {
                   if (response.ok) {
                       fetchAllUsers();

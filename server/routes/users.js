@@ -8,7 +8,7 @@ router.get('/getall', (req, res, next) => {
   // if (req.session.userData) {
     userDal.getAll()
       .then((result) => {
-        res.send(result);
+        res.send(result.rows);
       }).catch((err) => {
         res.status(500).send(err);
     });
@@ -23,8 +23,8 @@ router.post('/login', (req, res, next) => {
   
   userDal.userLogin(userData.username, userData.password)
     .then(result => {
-      if (result) {
-        req.session.userData = result;
+      if (result && result.rowCount != 0) {
+        req.session.userData = result.rows[0];
         req.session.save();
         res.status(200).json();
       } else {
@@ -44,9 +44,10 @@ router.get('/logout', (req, res, next) => {
 router.post('/register', (req, res, next) => {
   let userData = {
     Username: req.body.Username,
+    password: req.body.Password,
     Age: req.body.Age,
-    Fitness: req.body.Fitness,
-    Cities: req.body.Cities
+    Fitness: req.body.Fitness
+    // Cities: req.body.Cities
   };
 
   userDal.registerUser(userData)
@@ -63,13 +64,13 @@ router.post('/register', (req, res, next) => {
 
 router.get('/getUserData', (req, res, next) => {
   if (req.session.userData) {
-    userDal.getById(req.session.userData._id)
+    userDal.getById(req.session.userData.id)
       .then(result => {
-        res.status(200).json(result);
+        res.status(200).json(result.rows[0]);
       })
       .catch(err => {
         console.log(err);
-        res.send(500).send("Failed while trying to retrieve the user by id: " + req.session.userData._id);
+        res.send(500).send("Failed while trying to retrieve the user by id: " + req.session.userData.id);
       });
   } else {
     res.send(401).send("User must login");
@@ -82,10 +83,10 @@ router.post('/edit', (req, res, next) => {
       Username: req.body.Username,
       Age: req.body.Age,
       Fitness: req.body.Fitness,
-      Cities: req.body.Cities
+      // Cities: req.body.Cities
     };
 
-    userDal.updateUser(req.body._id, userData)
+    userDal.updateUser(req.body.id, userData)
       .then(result => {
         res.send(200).send();
       })

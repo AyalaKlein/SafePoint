@@ -1,72 +1,50 @@
-const { getDB, ObjectId } = require('./BaseDAL');
+const { pool, client } = require('./BaseDAL');
 const moment = require('moment')
-const collectionName = 'Shelters';
-let db = null;
 
-getDB().then((result) => {
-    db = result;
-})
+const getAll = async () => {
+    var sql ="SELECT * FROM \"Shelters\""
+    var res = pool.query(sql)
+    return res
+}
 
-const getAll = () => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).find().toArray()
-            .then(resolve)
-            .catch(reject);
-    });
+function getRandomInt(min = 1, max = 999999999) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const createShelter = (shelterData) => {
-    return new Promise((resolve, reject) => {
-        shelterData.lastUpdateDate = new Date();
-        shelterData.MaxPopulation = parseInt(shelterData.MaxPopulation);
-        db.collection(collectionName).insertOne(shelterData)
-            .then(resolve)
-            .catch(reject);
-    });
+    let query = {
+        text: "INSERT INTO \"Shelters\" (\"Id\", \"Description\", \"LocX\", \"LocY\", \"MaxPopulation\") values ($5, $1, $2, $3, $4)",
+        values: [shelterData.Description, shelterData.LocX, shelterData.LocY, parseInt(shelterData.MaxPopulation), getRandomInt()]
+    }
+
+    return pool.query(query)
 }
 
-const editShelter = (_id, shelterData) => {
-    return new Promise((resolve, reject) => {
-        shelterData.MaxPopulation = parseInt(shelterData.MaxPopulation);
-        db.collection(collectionName).updateOne({ _id: ObjectId(_id) }, { $set: shelterData })
-            .then(resolve)
-            .catch(reject);
-    });
+const editShelter = (id, shelterData) => {
+    let query = {
+        text: "UPDATE \"Shelters\" SET \"Description\"=$1, \"LocX\"=$2, \"LocY\"=$3, \"MaxPopulation\"=$4 WHERE \"Id\" = $5",
+        values: [shelterData.Description, shelterData.LocX, shelterData.LocY, parseInt(shelterData.MaxPopulation), id]
+    }
+
+    return pool.query(query)
 }
 
-const deleteShelter = (_id) => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).deleteOne({ _id: ObjectId(_id) })
-            .then(resolve)
-            .catch(reject);
-    })
+const deleteShelter = (id) => {
+    let query = {
+        text: "DELETE FROM \"Shelters\" WHERE \"Id\"=$1",
+        values: [id]
+    }
+    return pool.query(query)
 }
 
 const sheltersByMonth = () => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).aggregate([
-            {
-                "$match": {
-                    "lastUpdateDate": { "$gte": moment().subtract(4, 'months').toDate() }
-                }
-            },
-            {
-                "$group": {
-                    _id: { $dateToString: { format: "%Y-%m", date: "$lastUpdateDate" } },
-                    count: { $sum: 1 }
-                }
-            }]).toArray()
-            .then(resolve)
-            .catch(reject);
-    })
+    return pool.query("SELECT shel.lastUpdateDate, count(shel.* ) FROM \"Shelters\" as shel group by shel.lastUpdateDate")
 }
 
 const sheltersCountByMaxPopulation = () => {
-    return new Promise((resolve, reject) => {
-        db.collection(collectionName).aggregate([{ "$group": { _id: "$MaxPopulation", count: { $sum: 1 } } }, { $sort: { "count": -1, "_id": -1 } }]).toArray()
-            .then(resolve)
-            .catch(reject);
-    });
+    return pool.query("SELECT MaxPopulation, count(*) FROM \"Shelters\" group by \"Shelters\".MaxPopulation")
 }
 
 module.exports = { getAll, createShelter, editShelter, deleteShelter, sheltersByMonth, sheltersCountByMaxPopulation } 
