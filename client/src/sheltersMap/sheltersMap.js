@@ -3,35 +3,50 @@ import React, { useState, Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
-import { InfoWindow } from 'google-map-react';
-import MaterialTable from 'material-table';
-import AddBox from '@material-ui/icons/AddBox';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import Check from '@material-ui/icons/Check';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import Clear from '@material-ui/icons/Clear';
-import DeleteOutline from '@material-ui/icons/DeleteOutline';
-import Edit from '@material-ui/icons/Edit';
-import FilterList from '@material-ui/icons/FilterList';
-import FirstPage from '@material-ui/icons/FirstPage';
-import LastPage from '@material-ui/icons/LastPage';
-import Remove from '@material-ui/icons/Remove';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-import Search from '@material-ui/icons/Search';
-import ViewColumn from '@material-ui/icons/ViewColumn';
+import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
+import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
+import { Announced } from 'office-ui-fabric-react/lib/Announced';
+import {
+  DetailsList,
+  DetailsListLayoutMode,
+  Selection,
+  SelectionMode,
+  IColumn,
+} from 'office-ui-fabric-react/lib/DetailsList';
 
 const mapStyles = {
   width: '100%',
   height: '100%'
 };
 
-const sideViewSize = 120;
+const sideViewSize = 500;
 const topViewSize = 56;
 
 const Marker = () => <Icon iconName="HomeSolid" className="map-marker"></Icon>
 
 class MapContainer extends Component {
+
+
+  _commands = [
+    {
+      key: 'add',
+      text: 'Add',
+      iconProps: { iconName: 'Add' },
+      onClick: () => {
+        const { shelters, creationMode } = this.state;
+        if (creationMode) return;
+        this.setState({
+          shelters: [...shelters, { id: -1, locX: null, loxY: null, description: '', maxPopulation: 0 }],
+          creationMode: true,
+          editable: { id: -1 },
+          editableIndex: shelters.length
+        })
+      },
+    },
+  ]
+
   constructor(props) {
     super(props);
     this.shelterClicked = this.shelterClicked.bind(this);
@@ -46,9 +61,11 @@ class MapContainer extends Component {
     this.fetchData()
   }
 
+
+
   fetchData() {
 
-    fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/getAll`)
+    fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -63,7 +80,7 @@ class MapContainer extends Component {
 
   onRowAddCallback = (newData) => {
     return new Promise(resolve => {
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/create`, {
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -82,8 +99,8 @@ class MapContainer extends Component {
 
   onRowUpdateCallback = (newData, oldData) => {
     return new Promise(resolve => {
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/edit`, {
-        method: 'POST',
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/${oldData.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -102,7 +119,9 @@ class MapContainer extends Component {
 
   onRowDeleteCallback = (oldData) => {
     return new Promise(resolve => {
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/shelters/delete/${oldData.Id}`)
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/delete/${oldData.Id}`, {
+        method: 'DELETE'
+      })
         .then(response => {
           if (response.ok) {
             this.fetchData();
@@ -121,32 +140,109 @@ class MapContainer extends Component {
     });
   }
 
-  mapClicked(a, b) {
-    this.setState({
-      clickedShelter: null
-    })
+  mapClicked({lat, lng}) {
+    const { creationMode, editableIndex, shelters } = this.state;
+    let newShelters = [...shelters];
+    if (creationMode && shelters[editableIndex].loxY === null) {
+      let newShelter = null;
+      newShelter = {...shelters[editableIndex]};
+      newShelter.locY = lat;
+      newShelter.locX = lng;
+      newShelters[editableIndex] = newShelter
+      this.setState({
+        shelters: newShelters
+      })
+    }
   }
 
   displayMarkers = () => {
     return this.state.shelters.map((shelter, index) => {
       return (
         <Marker key={shelter.Id}
-          lat={parseFloat(shelter.LocY)}
-          lng={parseFloat(shelter.LocX)}
+          lat={parseFloat(shelter.locY)}
+          lng={parseFloat(shelter.locX)}
           onClick={this.shelterClicked}>
         </Marker>
       )
     })
   }
 
+  makeEditable = (item, index) => {
+    this.setState({
+      editable: { id: item.id },
+      editableIndex: index
+    })
+  }
+
+  saveChanges = () => {
+    const { editable, creationMode, shelters, editableIndex } = this.state;
+    if (!editable) return;
+    let newItem = shelters[editableIndex];
+    if (creationMode) {
+      this.onRowAddCallback(newItem);
+    }
+    else {
+      this.onRowUpdateCallback(newItem)
+    }
+    this.setState({
+      editable: false,
+      creationMode: false,
+      shelters: shelters.splice(editableIndex, 1, [newItem]),
+      editableIndex: null
+    })
+  }
+
+  deleteChanges = (item) => {
+    const { editable, creationMode, shelters, editableIndex } = this.state;
+    if (!editable) return;
+    var newShelters = [...shelters];
+    if (creationMode) {
+      newShelters.splice(editableIndex);
+    } else {
+      newShelters[editableIndex]= editable;
+    }
+    this.setState({
+      editable: false,
+      creationMode: false,
+      shelters: newShelters,
+      editableIndex: null
+    })
+  }
+
+  _renderColumn = (item, index, column) => {
+    const { shelters, editableIndex } = this.state;
+    if (column.key === 'action') {
+      return editableIndex !== index ? <IconButton styles={{ icon: { fontSize: '10px' } }}
+        onClick={() => this.makeEditable(item)} iconProps={{ iconName: 'Edit' }} />
+        : <span>
+          <IconButton styles={{ icon: { fontSize: '10px' } }}
+            onClick={() => this.saveChanges()} iconProps={{ iconName: 'CheckMark' }} />
+          <IconButton styles={{ icon: { fontSize: '10px' } }}
+            onClick={() => this.deleteChanges()} iconProps={{ iconName: 'Cancel' }} />
+        </span>
+
+    }
+    return this.state.editableIndex === index && column.key !== '3' ?
+      <TextField underlined defaultValue={item[column.fieldName]} onChange={(event) => {
+        shelters[this.state.editableIndex][column.fieldName] = event.target.value
+        this.setState({
+          shelters: shelters
+        })
+      }} />
+      : <span>{item[column.fieldName]}</span>
+  }
+
+
   render() {
     const { isExpanded } = this.state
 
     let lookupOptions = {};
     const columns = [
-      { title: 'Description', field: 'Description' },
-      { title: 'MaxPopulation', field: 'MaxPopulation', type: 'numeric', lookup: lookupOptions }
+      { name: 'Description', key: '1', fieldName: 'description', minWidth: 100 },
+      { name: 'Max Population', key: '2', fieldName: 'maxPopulation', minWidth: 100 },
+      { name: 'Action', key: 'action', minWidth: 100 }
     ];
+
     const { shelters, shelterChangesByMonth, sheltersCountByPopulation } = this.state
     console.log(isExpanded)
     let defaultProps = {
@@ -154,61 +250,57 @@ class MapContainer extends Component {
       zoom: 11
     };
 
-    return (
-      <div className="position-relative d-flex flex-row">
-        <div className="position-relative" style={{ width: isExpanded ? `initial` : '0px' }}>
 
-          <MaterialTable
-            title={null}
-            columns={columns}
-            data={shelters}
-            editable={{
-              onRowAdd: this.onRowAddCallback,
-              onRowUpdate: this.onRowUpdateCallback,
-              onRowDelete: this.onRowDeleteCallback
-            }}
-            icons={{
-              Add: () => <AddBox />,
-              Check: () => <Check />,
-              Clear: () => <Clear />,
-              Delete: () => <DeleteOutline />,
-              DetailPanel: () => <ChevronRight />,
-              Edit: () => <Edit />,
-              Export: () => <SaveAlt />,
-              Filter: () => <FilterList />,
-              FirstPage: () => <FirstPage />,
-              LastPage: () => <LastPage />,
-              NextPage: () => <ChevronRight />,
-              PreviousPage: () => <ChevronLeft />,
-              ResetSearch: () => <Clear />,
-              Search: () => <Search />,
-              SortArrow: () => <ArrowDownward />,
-              ThirdStateCheck: () => <Remove />,
-              ViewColumn: () => <ViewColumn />,
-            }}
-            options={{
-              filtering: true
-            }}
-          />
-          <IconButton className="side-button ms-depth-16" styles={{ icon: { fontSize: '10px' } }} onClick={() => this.setState({ isExpanded: !isExpanded })} iconProps={{ iconName: isExpanded ? 'FlickRight' : 'FlickLeft' }} title="Toggle side panel" ariaLabel="Add" />
-        </div>
-        <div style={{ height: `calc(100vh - ${topViewSize}px)`, width: isExpanded ? `calc(100vw - ${sideViewSize}px)` : '100vw' }}>
-          <GoogleMapReact
-            bootstrapURLKeys={{ key: 'AIzaSyA9JeZYGM9vsytm45dXISaRlRnW5HYSDic' }}
-            defaultZoom={defaultProps.zoom}
-            defaultCenter={defaultProps.center}
-            onChildClick={this.shelterClicked}
-            onClick={this.mapClicked}>
-            {this.displayMarkers()}
-            {/* {this.state.clickedShelter && 
+    this._selection = new Selection({
+      onSelectionChanged: () => {
+        // this.setState({
+        //   selectionDetails: this._getSelectionDetails(),
+        // });
+      },
+    });
+
+    return (
+      <Fabric>
+        <div className="position-relative d-flex flex-row">
+          <div className="position-relative" style={{ width: isExpanded ? `${sideViewSize}px` : '0px' }}>
+            <CommandBar items={this._commands} />
+            <DetailsList
+              items={shelters}
+              compact={false}
+              columns={columns}
+              selectionMode={SelectionMode.single}
+              getKey={item => item.Id}
+              setKey="multiple"
+              layoutMode={DetailsListLayoutMode.justified}
+              isHeaderVisible={true}
+              selection={this._selection}
+              selectionPreservedOnEmptyClick={true}
+              enterModalSelectionOnTouch={true}
+              onRenderItemColumn={this._renderColumn}
+              ariaLabelForSelectionColumn="Toggle selection"
+              ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+              checkButtonAriaLabel="Row checkbox"
+            />
+            <IconButton className="side-button ms-depth-16" styles={{ icon: { fontSize: '10px' } }} onClick={() => this.setState({ isExpanded: !isExpanded })} iconProps={{ iconName: isExpanded ? 'FlickRight' : 'FlickLeft' }} title="Toggle side panel" ariaLabel="Expand" />
+          </div>
+          <div style={{ height: `calc(100vh - ${topViewSize}px)`, width: isExpanded ? `calc(100vw - ${sideViewSize}px)` : '100vw' }}>
+            <GoogleMapReact
+              bootstrapURLKeys={{ key: 'AIzaSyA9JeZYGM9vsytm45dXISaRlRnW5HYSDic' }}
+              defaultZoom={defaultProps.zoom}
+              defaultCenter={defaultProps.center}
+              onChildClick={this.shelterClicked}
+              onClick={this.mapClicked}>
+              {this.displayMarkers()}
+              {/* {this.state.clickedShelter && 
 					 <InfoWindow position={{lat: this.state.clickedShelter.lat, lng: this.state.clickedShelter.lng}}>
 					     <h1>{this.state.clickedShelter.description}</h1>
 					 </InfoWindow>
 				 } */}
-          </GoogleMapReact>
+            </GoogleMapReact>
+          </div>
         </div>
-      </div>
 
+      </Fabric>
     )
   }
 }
