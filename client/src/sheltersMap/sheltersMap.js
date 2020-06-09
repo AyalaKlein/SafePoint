@@ -89,6 +89,7 @@ class MapContainer extends Component {
       })
         .then(response => {
           if (response.ok) {
+            this.fetchData();
             resolve();
           } else {
             throw new Error('Something went wrong ...');
@@ -97,9 +98,9 @@ class MapContainer extends Component {
     });
   };
 
-  onRowUpdateCallback = (newData, oldData) => {
+  onRowUpdateCallback = (newData) => {
     return new Promise(resolve => {
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/${oldData.id}`, {
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/${newData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -119,7 +120,7 @@ class MapContainer extends Component {
 
   onRowDeleteCallback = (oldData) => {
     return new Promise(resolve => {
-      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/delete/${oldData.Id}`, {
+      fetch(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/shelters/${oldData.id}`, {
         method: 'DELETE'
       })
         .then(response => {
@@ -143,7 +144,7 @@ class MapContainer extends Component {
   mapClicked({lat, lng}) {
     const { creationMode, editableIndex, shelters } = this.state;
     let newShelters = [...shelters];
-    if (creationMode && shelters[editableIndex].loxY === null) {
+    if (shelters[editableIndex]) {
       let newShelter = null;
       newShelter = {...shelters[editableIndex]};
       newShelter.locY = lat;
@@ -212,8 +213,13 @@ class MapContainer extends Component {
   _renderColumn = (item, index, column) => {
     const { shelters, editableIndex } = this.state;
     if (column.key === 'action') {
-      return editableIndex !== index ? <IconButton styles={{ icon: { fontSize: '10px' } }}
-        onClick={() => this.makeEditable(item)} iconProps={{ iconName: 'Edit' }} />
+      return editableIndex !== index ? 
+      <span>
+        <IconButton styles={{ icon: { fontSize: '10px' } }}
+        onClick={() => this.makeEditable(item, index)} iconProps={{ iconName: 'Edit' }} />
+        <IconButton styles={{ icon: { fontSize: '10px' } }}
+        onClick={() => this.onRowDeleteCallback(item)} iconProps={{ iconName: 'Delete' }} />
+      </span>
         : <span>
           <IconButton styles={{ icon: { fontSize: '10px' } }}
             onClick={() => this.saveChanges()} iconProps={{ iconName: 'CheckMark' }} />
@@ -246,7 +252,7 @@ class MapContainer extends Component {
     const { shelters, shelterChangesByMonth, sheltersCountByPopulation } = this.state
     console.log(isExpanded)
     let defaultProps = {
-      center: { lat: 47.444, lng: -122.176 },
+      center: { lat: 31.828, lng: 34.6957 },
       zoom: 11
     };
 
