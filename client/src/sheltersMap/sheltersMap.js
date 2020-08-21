@@ -38,7 +38,7 @@ class MapContainer extends Component {
         const { shelters, creationMode } = this.state;
         if (creationMode) return;
         this.setState({
-          shelters: [...shelters, { id: -1, locX: null, loxY: null, description: '', maxPopulation: 0 }],
+          shelters: [...shelters, { id: -1, locX: null, loxY: null, description: '', maxCapacity: 0 }],
           creationMode: true,
           editable: { id: -1 },
           editableIndex: shelters.length
@@ -245,7 +245,7 @@ class MapContainer extends Component {
     let lookupOptions = {};
     const columns = [
       { name: 'Description', key: '1', fieldName: 'description', minWidth: 100 },
-      { name: 'Max Population', key: '2', fieldName: 'maxPopulation', minWidth: 100 },
+      { name: 'Max Capacity', key: '2', fieldName: 'maxCapacity', minWidth: 100 },
       { name: 'Action', key: 'action', minWidth: 100 }
     ];
 

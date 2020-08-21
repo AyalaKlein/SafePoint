@@ -54,13 +54,13 @@ class App extends Component {
           <Collapse navbar>
             <Nav className="mr-auto nav" navbar>
               <NavItem>
-                <NavLink onClick={this.handleClick.bind(this, 'about')}>About</NavLink>
+                <NavLink disabled onClick={this.handleClick.bind(this, 'about')}>About</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink onClick={this.handleClick.bind(this, 'users')}>Users</NavLink>
+                <NavLink disabled onClick={this.handleClick.bind(this, 'users')}>Users</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink onClick={this.handleClick.bind(this, 'shelters')}>Shelters</NavLink>
+                <NavLink disabled onClick={this.handleClick.bind(this, 'shelters')}>Shelters</NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="https://github.com/AyalaKlein/SafePoint">GitHub</NavLink>
@@ -68,7 +68,7 @@ class App extends Component {
             </Nav>
             <Nav>
               <NavItem>
-                <NavLink onClick={this.handleClick.bind(this, 'profile')}>My Profile</NavLink>
+                <NavLink disabled onClick={this.handleClick.bind(this, 'profile')}>My Profile</NavLink>
               </NavItem>
             </Nav>
 
